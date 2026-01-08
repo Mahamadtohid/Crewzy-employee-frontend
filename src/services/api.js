@@ -2,20 +2,20 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: "http://localhost:8000",
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-// Attach JWT automatically
-API.interceptors.request.use((req) => {
-  if (!req.url.includes("/login")) {
-    const token = localStorage.getItem("token");
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token"); // 👈 MUST EXIST
     if (token) {
-      req.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
-  }
-  return req;
-});
-
-
-
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default API;

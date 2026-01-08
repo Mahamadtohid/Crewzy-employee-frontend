@@ -26,6 +26,7 @@ import {
   Work,
   CalendarToday,
   Close,
+  AdminPanelSettings,
 } from "@mui/icons-material";
 
 function Dashboard() {
@@ -43,10 +44,11 @@ function Dashboard() {
     name: "",
     email: "",
     role: "",
+    userrole: "",
     date_joined: "",
   });
 
-  const roles = ["employee", "admin", "librarian", "manager"];
+  const userRoles = ["Admin", "User"];
 
   // Read from URL
   const search = searchParams.get("search") || "";
@@ -122,6 +124,7 @@ function Dashboard() {
       name: "",
       email: "",
       role: "",
+      userrole: "",
       date_joined: "",
     });
   };
@@ -132,6 +135,7 @@ function Dashboard() {
       name: "",
       email: "",
       role: "",
+      userrole: "",
       date_joined: "",
     });
   };
@@ -144,16 +148,48 @@ function Dashboard() {
     e.preventDefault();
     setLoading(true);
 
+    // Validate form data
+    if (!form.name || !form.email || !form.role || !form.date_joined) {
+      alert("Please fill in all required fields (Name, Email, Role, Date Joined)");
+      setLoading(false);
+      return;
+    }
+
+    console.log("Submitting form data:", form);
+    console.log("Form data structure:", JSON.stringify(form, null, 2));
+
     try {
-      const response = await API.post("/employees", form);
+      // Prepare data for backend - try with user_role first, fallback if backend doesn't support it
+      const employeeData = {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        role: form.role.trim(),
+        userrole: form.userrole,
+        date_joined: form.date_joined,
+      };
+      
+      // Add user_role only if it's provided (backend might not support it yet)
+      // if (form.user_role) {
+      //   employeeData.user_role = form.user_role;
+      // }
+      
+      console.log("Sending to backend:", employeeData);
+      
+      const response = await API.post("/employees", employeeData);
       console.log("Employee added:", response.data);
+      console.log("Full response:", response);
       alert("Employee added successfully");
       handleCloseDialog();
       // Refresh the employee list
       await fetchEmployees();
     } catch (err) {
       console.error("Error adding employee:", err);
-      const errorMessage = err.response?.data?.message || err.message || "Failed to add employee";
+      console.error("Error response:", err.response?.data);
+      const errorMessage = 
+        err.response?.data?.message || 
+        err.response?.data?.detail || 
+        err.message || 
+        "Failed to add employee. Please check the console for details.";
       alert(errorMessage);
     } finally {
       setLoading(false);
@@ -553,11 +589,11 @@ function Dashboard() {
                 }}
               />
 
-              {/* Role Field */}
+              {/* Role Field - Text Input */}
               <TextField
                 label="Role"
                 name="role"
-                select
+                placeholder="Enter role (e.g., employee, manager, etc.)"
                 variant="outlined"
                 fullWidth
                 value={form.role}
@@ -588,10 +624,47 @@ function Dashboard() {
                     color: "#3b82f6",
                   },
                 }}
+              />
+
+              {/* User Role Field - Dropdown */}
+              <TextField
+                label="User Role"
+                name="userrole"
+                select
+                variant="outlined"
+                fullWidth
+                value={form.userrole}
+                onChange={handleFormChange}
+                required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AdminPanelSettings sx={{ color: "#9ca3af", fontSize: "20px" }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3b82f6",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3b82f6",
+                      borderWidth: "2px",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#6b7280",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#3b82f6",
+                  },
+                }}
               >
-                {roles.map((role) => (
-                  <MenuItem key={role} value={role}>
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
+                {userRoles.map((userRole) => (
+                  <MenuItem key={userRole} value={userRole}>
+                    {userRole}
                   </MenuItem>
                 ))}
               </TextField>
