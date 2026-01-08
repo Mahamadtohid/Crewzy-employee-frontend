@@ -38,7 +38,6 @@ function EmployeeTable({ employees, sortConfig = { key: null, direction: "asc" }
     return colors[index];
   };
 
-  // Sort icon component
   const SortIcon = ({ columnKey }) => {
     if (sortConfig.key !== columnKey) {
       return <UnfoldMoreIcon sx={{ fontSize: "16px", color: "#9ca3af" }} />;
@@ -118,6 +117,12 @@ function EmployeeTable({ employees, sortConfig = { key: null, direction: "asc" }
               Role(s)
             </SortableHeaderCell>
             <SortableHeaderCell
+              columnKey="user_role"
+              onClick={() => onSortChange("user_role")}
+            >
+              User Role
+            </SortableHeaderCell>
+            <SortableHeaderCell
               columnKey="date_joined"
               onClick={() => onSortChange("date_joined")}
             >
@@ -129,7 +134,7 @@ function EmployeeTable({ employees, sortConfig = { key: null, direction: "asc" }
         <TableBody>
           {employees.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} align="center" sx={{ padding: "40px" }}>
+              <TableCell colSpan={6} align="center" sx={{ padding: "40px" }}>
                 <Typography sx={{ color: "#6b7280", fontSize: "14px" }}>
                   No employees found
                 </Typography>
@@ -218,6 +223,21 @@ function EmployeeTable({ employees, sortConfig = { key: null, direction: "asc" }
                     }}
                   >
                     {emp.role || "N/A"}
+                  </Box>
+                </TableCell>
+                <TableCell sx={{ padding: "16px" }}>
+                  <Box
+                    sx={{
+                      display: "inline-block",
+                      padding: "4px 12px",
+                      borderRadius: "12px",
+                      backgroundColor: emp.user_role === "Admin" ? "#fef3c7" : "#dbeafe",
+                      color: emp.user_role === "Admin" ? "#92400e" : "#1e40af",
+                      fontSize: "12px",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {emp.userrole || "N/A"}
                   </Box>
                 </TableCell>
                 <TableCell sx={{ padding: "16px", color: "#6b7280", fontSize: "14px" }}>

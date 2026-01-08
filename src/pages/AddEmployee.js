@@ -51,7 +51,7 @@ function AddEmployee() {
       const response = await API.post("/employees", form);
       console.log("Employee added successfully:", response.data);
       alert("Employee added successfully");
-      // Reset form
+      
       setForm({
         name: "",
         email: "",
@@ -73,7 +73,6 @@ function AddEmployee() {
     }
   };
 
-  // Backup onClick handler (though form onSubmit should handle it)
   const handleButtonClick = (e) => {
     e.preventDefault();
     const formElement = e.target.closest("form");
