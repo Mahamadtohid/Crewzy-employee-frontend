@@ -4,72 +4,101 @@ import API from "../services/api";
 import EmployeeTable from "../components/EmployeeTable";
 import Logout from "../components/Logout";
 import TextField from '@mui/material/TextField';
+import Pagination from "@mui/material/Pagination";
+import Button from "@mui/material/Button";
+
 
 function Dashboard() {
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+
 
   const fetchEmployees = async () => {
-    try {
-      const res = await API.get(`/employees?search=${search}`);
-      setEmployees(res.data);
-    } catch (err) {
-      console.error("FETCH EMPLOYEES ERROR:", err);
-    }
-  };
+  try {
+    const res = await API.get(
+      `/employees?search=${search}&page=${page}&limit=${limit}`
+    );
+
+    setEmployees(res.data.data);   // 👈 array
+    setTotal(res.data.total);      // 👈 number
+  } catch (err) {
+    console.error("FETCH EMPLOYEES ERROR:", err);
+  }
+};
+
+
 
   useEffect(() => {
-    fetchEmployees();
-  }, []);
+  fetchEmployees();
+}, [page]);
+
+const totalPages = Math.ceil(total / limit);
+
 
   return (
-    <div className="min-h-screen bg-slate-100 py-10">
-      <div className="max-w-6xl mx-auto px-4">
+  <div className="min-h-screen bg-slate-100 py-10 relative">
+    <div className="max-w-6xl mx-auto px-4">
 
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-semibold text-gray-700">
-            Employee Directory
-          </h1>
+      {/* Title */}
+      <h1 className="text-3xl font-semibold text-gray-700 text-center mb-10">
+        Employee Directory
+      </h1>
 
-          <div className="flex gap-3">
-            <button
-              onClick={() => navigate("/add-employee")}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-            >
-              + Add Employee
-            </button>
-
-            <Logout />
-          </div>
-        </div>
+      {/* Top controls */}
+      <div className="flex justify-between items-end mb-6">
 
         {/* Search */}
-        <div className="flex justify-center mb-6 gap-2">
-          {/* <input
+        <div className="flex gap-2">
+          <TextField
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            label="Search employee"
             placeholder="Search by name or role"
-            className="w-72 px-4 py-2 border rounded-lg"
-          /> */}
-          <TextField id="filled-basic" value={search} 
-            onChange={(e) => setSearch(e.target.value)}
-          label="Filled"  placeholder="Search by name or role" variant="filled" />
-          <button
+            variant="filled"
+            size="small"
+          />
+          <Button
+            variant="contained"
+            color="primary"
             onClick={fetchEmployees}
-            className="bg-indigo-500 text-white px-4 rounded-lg"
           >
             Search
-          </button>
+          </Button>
         </div>
 
-        {/* Table */}
-        <EmployeeTable employees={employees} />
-
+        {/* Add Employee */}
+        <Button
+          variant="contained"
+          color="success"
+          onClick={() => navigate("/add-employee")}
+        >
+          + Add Employee
+        </Button>
       </div>
+
+      {/* Table */}
+      <EmployeeTable employees={employees} />
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-6">
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(e, value) => setPage(value)}
+            color="primary"
+          />
+        </div>
+      )}
+
     </div>
-  );
+  </div>
+);
 }
 
 export default Dashboard;

@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
+import Logout from './Logout';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -72,7 +73,7 @@ export default function Navigation() {
           >
             Crewzy Employee Directory
           </Typography>
-          <Search>
+          {/* <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
@@ -80,7 +81,9 @@ export default function Navigation() {
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
             />
-          </Search>
+          </Search> */}
+
+          <Logout />
         </Toolbar>
       </AppBar>
     </Box>

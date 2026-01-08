@@ -1,21 +1,15 @@
-import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
 
 function Logout() {
-  const navigate = useNavigate();
-
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/");
-    window.location.reload(); 
+    window.location.href = "/";
   };
 
   return (
-    <button
-      onClick={handleLogout}
-      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-    >
+    <Button variant="contained" color="error" onClick={handleLogout}>
       Logout
-    </button>
+    </Button>
   );
 }
 

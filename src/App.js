@@ -8,12 +8,14 @@ function App() {
   const token = localStorage.getItem("token");
 
   if (!token) {
+    // <Navigation/>
     return <Login />;
   }
 
   return (
     <BrowserRouter>
     <Navigation/>
+    
       <Routes>
         <Route path="/" element={<DashBoard />} />
         <Route path="/add-employee" element={<AddEmployee />} />

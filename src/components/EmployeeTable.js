@@ -7,6 +7,10 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
 function EmployeeTable({ employees }) {
+
+  if (!Array.isArray(employees)) {
+    return null;
+  }
   return (
     <TableContainer component={Paper} elevation={3}>
       <Table sx={{ minWidth: 650 }} aria-label="employee table">
@@ -35,7 +39,10 @@ function EmployeeTable({ employees }) {
                 <TableCell>{emp.email}</TableCell>
                 <TableCell>{emp.role}</TableCell>
                 <TableCell>
-                  {new Date(emp.date_joined).toLocaleDateString()}
+                  {emp.date_joined
+  ? new Date(emp.date_joined).toLocaleDateString()
+  : "-"}
+
                 </TableCell>
               </TableRow>
             ))
