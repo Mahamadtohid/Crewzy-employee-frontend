@@ -1,27 +1,104 @@
-function DashBoard() {
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import API from "../services/api";
+import EmployeeTable from "../components/EmployeeTable";
+import Logout from "../components/Logout";
+import TextField from '@mui/material/TextField';
+import Pagination from "@mui/material/Pagination";
+import Button from "@mui/material/Button";
+
+
+function Dashboard() {
+  const [employees, setEmployees] = useState([]);
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+
+
+  const fetchEmployees = async () => {
+  try {
+    const res = await API.get(
+      `/employees?search=${search}&page=${page}&limit=${limit}`
+    );
+
+    setEmployees(res.data.data);   // 👈 array
+    setTotal(res.data.total);      // 👈 number
+  } catch (err) {
+    console.error("FETCH EMPLOYEES ERROR:", err);
+  }
+};
+
+
+
+  useEffect(() => {
+  fetchEmployees();
+}, [page]);
+
+const totalPages = Math.ceil(total / limit);
+
+
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">Employees</h1>
+  <div className="min-h-screen bg-slate-100 py-10 relative">
+    <div className="max-w-6xl mx-auto px-4">
 
-      <div className="mb-4 flex gap-2">
-        <input
-          className="p-2 border rounded w-64"
-          placeholder="Search by name or role"
-        />
-        <button className="bg-blue-600 text-white px-4 rounded">
-          Search
-        </button>
-      </div>
+      {/* Title */}
+      <h1 className="text-3xl font-semibold text-gray-700 text-center mb-10">
+        Employee Directory
+      </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Example Card */}
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="font-semibold text-lg">John Doe</h2>
-          <p className="text-gray-600">Backend Engineer</p>
-          <p className="text-sm text-gray-400">john@example.com</p>
+      {/* Top controls */}
+      <div className="flex justify-between items-end mb-6">
+
+        {/* Search */}
+        <div className="flex gap-2">
+          <TextField
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            label="Search employee"
+            placeholder="Search by name or role"
+            variant="filled"
+            size="small"
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={fetchEmployees}
+          >
+            Search
+          </Button>
         </div>
+
+        {/* Add Employee */}
+        <Button
+          variant="contained"
+          color="success"
+          onClick={() => navigate("/add-employee")}
+        >
+          + Add Employee
+        </Button>
       </div>
+
+      {/* Table */}
+      <EmployeeTable employees={employees} />
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-6">
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(e, value) => setPage(value)}
+            color="primary"
+          />
+        </div>
+      )}
+
     </div>
-  );
+  </div>
+);
 }
-export default DashBoard;
+
+export default Dashboard;
