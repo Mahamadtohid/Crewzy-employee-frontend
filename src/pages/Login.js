@@ -1,5 +1,6 @@
-import axios from "axios";
 import { useState } from "react";
+import axios from "axios";
+import Button from "@mui/material/Button";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -23,23 +24,53 @@ function Login() {
         }
       );
 
-      console.log("LOGIN OK:", res.data);
-
+      // ✅ Save JWT
       localStorage.setItem("token", res.data.access_token);
+
+      // ✅ Reload app to trigger auth state
       window.location.reload();
 
     } catch (err) {
-      console.error("LOGIN FAILED:", err);
-      alert("Login failed");
+      console.error("LOGIN ERROR:", err);
+      alert("Invalid credentials");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input value={username} onChange={e => setUsername(e.target.value)} />
-      <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
-      <button type="submit">Login</button>
-    </form>
+    <div className="min-h-screen flex items-center justify-center bg-slate-100">
+      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg">
+        <h2 className="text-2xl font-semibold text-center text-indigo-600 mb-6">
+          Employee Login
+        </h2>
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <input
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+
+          <input
+            type="password"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          {/* IMPORTANT: type="submit" */}
+          <Button
+            type="submit"
+            color="secondary"
+          >
+            Login
+          </Button>
+        </form>
+      </div>
+    </div>
   );
 }
 

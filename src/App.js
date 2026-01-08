@@ -1,17 +1,25 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
 import DashBoard from "./pages/DashBoard";
 import AddEmployee from "./pages/AddEmployee";
-import Login from "./pages/Login";
+import Navigation from "./components/Navigation";
 
 function App() {
   const token = localStorage.getItem("token");
 
-  if (!token) return <Login />
+  if (!token) {
+    return <Login />;
+  }
 
   return (
-    <div>
-      <DashBoard />
-      <AddEmployee />
-    </div>
+    <BrowserRouter>
+    <Navigation/>
+      <Routes>
+        <Route path="/" element={<DashBoard />} />
+        <Route path="/add-employee" element={<AddEmployee />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
