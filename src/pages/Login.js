@@ -1,46 +1,45 @@
-import React, { useState } from "react";
-import API from "../services/api";
+import axios from "axios";
+import { useState } from "react";
 
-function Login({ onLogin }) {
+function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("username", username);
-    formData.append("password", password);
+    const params = new URLSearchParams();
+    params.append("username", username);
+    params.append("password", password);
 
     try {
-      const res = await API.post("/login", formData);
+      const res = await axios.post(
+        "http://127.0.0.1:8000/login",
+        params,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+
+      console.log("LOGIN OK:", res.data);
+
       localStorage.setItem("token", res.data.access_token);
-      onLogin();
+      window.location.reload();
+
     } catch (err) {
-      alert("Invalid credentials");
+      console.error("LOGIN FAILED:", err);
+      alert("Login failed");
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <br />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <br />
-        <button type="submit">Login</button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <input value={username} onChange={e => setUsername(e.target.value)} />
+      <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <button type="submit">Login</button>
+    </form>
   );
 }
 

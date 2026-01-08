@@ -1,23 +1,16 @@
-import logo from './logo.svg';
-import './App.css';
+import DashBoard from "./pages/DashBoard";
+import AddEmployee from "./pages/AddEmployee";
+import Login from "./pages/Login";
 
 function App() {
+  const token = localStorage.getItem("token");
+
+  if (!token) return <Login />
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <DashBoard />
+      <AddEmployee />
     </div>
   );
 }
