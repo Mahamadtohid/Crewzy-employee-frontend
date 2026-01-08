@@ -17,7 +17,6 @@ import {
   Work,
   CalendarToday,
   ArrowBack,
-  AdminPanelSettings,
 } from "@mui/icons-material";
 
 function AddEmployee() {
@@ -28,75 +27,59 @@ function AddEmployee() {
     name: "",
     email: "",
     role: "",
-    userrole: "",
     date_joined: "",
   });
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Frontend validation
-    if (
-      !form.name ||
-      !form.email ||
-      !form.role ||
-      !form.userrole ||
-      !form.date_joined
-    ) {
-      alert("Please fill in all fields");
+    // Validate form data
+    if (!form.name || !form.email || !form.role || !form.date_joined) {
+      alert("Please fill in all required fields");
       setLoading(false);
       return;
     }
 
-    const employeeData = {
-      name: form.name.trim(),
-      email: form.email.trim(),
-      role: form.role.trim(),
-      userrole: form.userrole,
-      date_joined: form.date_joined, // YYYY-MM-DD
-    };
-
-    console.log("SENDING PAYLOAD:", JSON.stringify(employeeData, null, 2));
+    console.log("Submitting form data:", form);
 
     try {
-      await API.post("/employees", employeeData);
-
+      const response = await API.post("/employees", form);
+      console.log("Employee added successfully:", response.data);
       alert("Employee added successfully");
-
+      
       setForm({
         name: "",
         email: "",
         role: "",
-        userrole: "",
         date_joined: "",
       });
-
       navigate("/");
     } catch (err) {
-      // 🔴 DEBUG BLOCK — THIS IS WHAT YOU ASKED FOR
-      console.error("FULL ERROR:", err);
-
-      if (err.response) {
-        console.error("STATUS:", err.response.status);
-        console.error(
-          "DATA:",
-          JSON.stringify(err.response.data, null, 2)
-        );
-      } else {
-        console.error("NO RESPONSE:", err.message);
-      }
-
-      alert("Check console for detailed error");
+      console.error("Error adding employee:", err);
+      console.error("Error response:", err.response?.data);
+      const errorMessage = 
+        err.response?.data?.message || 
+        err.response?.data?.detail || 
+        err.message || 
+        "Failed to add employee. Please try again.";
+      alert(errorMessage);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleButtonClick = (e) => {
+    e.preventDefault();
+    const formElement = e.target.closest("form");
+    if (formElement) {
+      formElement.requestSubmit();
+    } else {
+      handleSubmit(e);
     }
   };
 
@@ -104,7 +87,7 @@ function AddEmployee() {
     navigate("/");
   };
 
-  const userRoles = ["Admin", "Employee"];
+  const roles = ["employee", "admin", "librarian", "manager"];
 
   return (
     <Box
@@ -122,8 +105,7 @@ function AddEmployee() {
           width: "100%",
           maxWidth: "520px",
           borderRadius: "16px",
-          boxShadow:
-            "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
           border: "1px solid #e5e7eb",
         }}
       >
@@ -138,133 +120,250 @@ function AddEmployee() {
                 textTransform: "none",
                 fontSize: "14px",
                 marginBottom: "16px",
-                "&:hover": { backgroundColor: "#f3f4f6" },
+                padding: "4px 8px",
+                "&:hover": {
+                  backgroundColor: "#f3f4f6",
+                },
               }}
             >
               Back to Dashboard
             </Button>
-
             <Typography
               variant="h4"
-              sx={{ fontSize: "28px", fontWeight: 700, color: "#111827" }}
+              sx={{
+                fontSize: "28px",
+                fontWeight: 700,
+                color: "#111827",
+                marginBottom: "8px",
+              }}
             >
               Add New Employee
             </Typography>
-
-            <Typography variant="body2" sx={{ color: "#6b7280" }}>
-              Fill in the details to add a new employee
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#6b7280",
+                fontSize: "14px",
+              }}
+            >
+              Fill in the details to add a new employee to the system
             </Typography>
           </Box>
 
           {/* Form */}
           <form onSubmit={handleSubmit}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              {/* Full Name Field */}
               <TextField
                 label="Full Name"
                 name="name"
+                placeholder="Enter full name"
+                variant="outlined"
+                fullWidth
                 value={form.name}
                 onChange={handleChange}
-                fullWidth
                 required
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Person />
+                      <Person sx={{ color: "#9ca3af", fontSize: "20px" }} />
                     </InputAdornment>
                   ),
                 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3b82f6",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3b82f6",
+                      borderWidth: "2px",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#6b7280",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#3b82f6",
+                  },
+                }}
               />
 
+              {/* Email Field */}
               <TextField
                 label="Email"
                 name="email"
                 type="email"
+                placeholder="Enter email address"
+                variant="outlined"
+                fullWidth
                 value={form.email}
                 onChange={handleChange}
-                fullWidth
                 required
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Email />
+                      <Email sx={{ color: "#9ca3af", fontSize: "20px" }} />
                     </InputAdornment>
                   ),
                 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3b82f6",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3b82f6",
+                      borderWidth: "2px",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#6b7280",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#3b82f6",
+                  },
+                }}
               />
 
+              {/* Role Field */}
               <TextField
                 label="Role"
                 name="role"
+                select
+                variant="outlined"
+                fullWidth
                 value={form.role}
                 onChange={handleChange}
-                fullWidth
                 required
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Work />
+                      <Work sx={{ color: "#9ca3af", fontSize: "20px" }} />
                     </InputAdornment>
                   ),
                 }}
-              />
-
-              <TextField
-                label="User Role"
-                name="userrole"
-                select
-                value={form.userrole}
-                onChange={handleChange}
-                fullWidth
-                required
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <AdminPanelSettings />
-                    </InputAdornment>
-                  ),
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3b82f6",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3b82f6",
+                      borderWidth: "2px",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#6b7280",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#3b82f6",
+                  },
                 }}
               >
-                {userRoles.map((role) => (
+                {roles.map((role) => (
                   <MenuItem key={role} value={role}>
-                    {role}
+                    {role.charAt(0).toUpperCase() + role.slice(1)}
                   </MenuItem>
                 ))}
               </TextField>
 
+              {/* Date Joined Field */}
               <TextField
                 label="Date Joined"
                 name="date_joined"
                 type="date"
+                variant="outlined"
+                fullWidth
                 value={form.date_joined}
                 onChange={handleChange}
-                fullWidth
                 required
-                InputLabelProps={{ shrink: true }}
+                InputLabelProps={{
+                  shrink: true,
+                }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <CalendarToday />
+                      <CalendarToday sx={{ color: "#9ca3af", fontSize: "20px" }} />
                     </InputAdornment>
                   ),
                 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3b82f6",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3b82f6",
+                      borderWidth: "2px",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "#6b7280",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#3b82f6",
+                  },
+                }}
               />
 
-              <Box sx={{ display: "flex", gap: "12px" }}>
+              {/* Action Buttons */}
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: "12px",
+                  marginTop: "8px",
+                }}
+              >
                 <Button
+                  type="button"
                   variant="outlined"
                   fullWidth
                   onClick={handleCancel}
                   disabled={loading}
+                  sx={{
+                    height: "44px",
+                    borderColor: "#e5e7eb",
+                    color: "#6b7280",
+                    textTransform: "none",
+                    fontSize: "15px",
+                    fontWeight: 500,
+                    borderRadius: "8px",
+                    "&:hover": {
+                      borderColor: "#d1d5db",
+                      backgroundColor: "#f9fafb",
+                    },
+                  }}
                 >
                   Cancel
                 </Button>
-
                 <Button
                   type="submit"
                   variant="contained"
                   fullWidth
                   disabled={loading}
-                  sx={{ backgroundColor: "#10b981" }}
+                  onClick={handleButtonClick}
+                  sx={{
+                    height: "44px",
+                    backgroundColor: "#10b981",
+                    color: "white",
+                    textTransform: "none",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    borderRadius: "8px",
+                    boxShadow: "none",
+                    "&:hover": {
+                      backgroundColor: "#059669",
+                      boxShadow: "none",
+                    },
+                    "&:disabled": {
+                      backgroundColor: "#9ca3af",
+                    },
+                  }}
                 >
                   {loading ? "Adding..." : "Add Employee"}
                 </Button>

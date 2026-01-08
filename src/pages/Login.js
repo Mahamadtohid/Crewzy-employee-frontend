@@ -17,6 +17,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
+    console.log("LOGIN BUTTON CLICKED");
     e.preventDefault();
 
     const params = new URLSearchParams();
@@ -35,6 +36,9 @@ function Login() {
       );
 
       localStorage.setItem("token", res.data.access_token);
+      localStorage.setItem("userrole", res.data.userrole);
+      localStorage.setItem("username", res.data.username);
+
       window.location.reload();
     } catch (err) {
       alert("Invalid credentials");

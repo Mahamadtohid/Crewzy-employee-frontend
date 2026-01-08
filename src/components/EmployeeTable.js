@@ -38,7 +38,6 @@ function EmployeeTable({ employees, sortConfig = { key: null, direction: "asc" }
     return colors[index];
   };
 
-  // Sort icon component
   const SortIcon = ({ columnKey }) => {
     if (sortConfig.key !== columnKey) {
       return <UnfoldMoreIcon sx={{ fontSize: "16px", color: "#9ca3af" }} />;
